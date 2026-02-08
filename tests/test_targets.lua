@@ -96,4 +96,23 @@ T["setup"]["reset_tmux_pane is callable"] = function()
   targets.reset_tmux_pane()
 end
 
+T["setup"]["on_select fires when setting default"] = function()
+  local selected = false
+  local user = {
+    { name = "custom", fn = function() end, on_select = function() selected = true end },
+  }
+  targets.register(user, nil)
+  targets.set_default("custom")
+  expect.equality(selected, true)
+end
+
+T["setup"]["on_select does not fire during register"] = function()
+  local selected = false
+  local user = {
+    { name = "custom", fn = function() end, on_select = function() selected = true end },
+  }
+  targets.register(user, "custom")
+  expect.equality(selected, false)
+end
+
 return T

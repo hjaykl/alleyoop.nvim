@@ -5,6 +5,7 @@ local notify = require("alleyoop.notify")
 ---@class alleyoop.Target
 ---@field name string
 ---@field fn fun(prompt: string)
+---@field on_select? fun() Called when this target becomes the default via set_default.
 
 ---@type table<string, alleyoop.Target>
 local registry = {}
@@ -28,6 +29,18 @@ local function get_builtins()
     },
     {
       name = "tmux",
+      on_select = function()
+        if vim.fn.executable("tmux") ~= 1 then
+          vim.notify("tmux is not available", vim.log.levels.ERROR)
+          return
+        end
+        vim.ui.input({ prompt = "Tmux target pane: " }, function(pane)
+          if not pane or pane == "" then
+            return
+          end
+          tmux_pane = pane
+        end)
+      end,
       fn = function(prompt)
         if vim.fn.executable("tmux") ~= 1 then
           vim.notify("tmux is not available", vim.log.levels.ERROR)
@@ -43,6 +56,7 @@ local function get_builtins()
         if tmux_pane then
           send(tmux_pane)
         else
+          -- Fallback if on_select was cancelled or target was set via config
           vim.ui.input({ prompt = "Tmux target pane: " }, function(pane)
             if not pane or pane == "" then
               return
@@ -91,6 +105,15 @@ function M.dispatch_default(prompt)
   M.dispatch(default_name, prompt)
 end
 
+local function activate_target(name)
+  default_name = name
+  notify.info("target", "Default target: " .. name)
+  local target = registry[name]
+  if target.on_select then
+    target.on_select()
+  end
+end
+
 --- Set the default target by name. nil triggers picker.
 ---@param name string|nil
 function M.set_default(name)
@@ -99,8 +122,7 @@ function M.set_default(name)
       vim.notify("Unknown target: " .. name, vim.log.levels.ERROR)
       return
     end
-    default_name = name
-    notify.info("target", "Default target: " .. name)
+    activate_target(name)
     return
   end
 
@@ -112,8 +134,7 @@ function M.set_default(name)
 
   picker.select(names, { prompt = "Default target:" }, function(choice)
     if choice then
-      default_name = choice
-      notify.info("target", "Default target: " .. choice)
+      activate_target(choice)
     end
   end)
 end
