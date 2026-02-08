@@ -115,6 +115,8 @@ function M.setup(opts)
   end
 
   opts = opts or {}
+  vim.validate("opts", opts, "table")
+
   -- Extract notify before tbl_deep_extend (false is not a table)
   local notify_opts = opts.notify
   opts.notify = nil
