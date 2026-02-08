@@ -10,23 +10,24 @@ local history_dir = ""
 local max_entries = 50
 
 local function read_file(path)
-  local f = io.open(path, "r")
-  if not f then
+  local fd = vim.uv.fs_open(path, "r", 0)
+  if not fd then return nil end
+  local stat = vim.uv.fs_fstat(fd)
+  if not stat then
+    vim.uv.fs_close(fd)
     return nil
   end
-  local content = f:read("*a")
-  f:close()
+  local content = vim.uv.fs_read(fd, stat.size, 0)
+  vim.uv.fs_close(fd)
   return content
 end
 
 local function write_file(path, content)
   vim.fn.mkdir(vim.fn.fnamemodify(path, ":h"), "p")
-  local f = io.open(path, "w")
-  if not f then
-    return
-  end
-  f:write(content)
-  f:close()
+  local fd = vim.uv.fs_open(path, "w", 438) -- 0o666
+  if not fd then return end
+  vim.uv.fs_write(fd, content, 0)
+  vim.uv.fs_close(fd)
 end
 
 local function get_history_files()
@@ -70,7 +71,7 @@ function M.save(content)
   -- Prune oldest entries
   local files = get_history_files()
   while #files > max_entries do
-    os.remove(files[1])
+    vim.uv.fs_unlink(files[1])
     table.remove(files, 1)
   end
   while #entries > max_entries do

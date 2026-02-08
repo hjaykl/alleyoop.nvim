@@ -11,23 +11,24 @@ local global_dir = ""
 ---@field scope string
 
 local function read_file(path)
-  local f = io.open(path, "r")
-  if not f then
+  local fd = vim.uv.fs_open(path, "r", 0)
+  if not fd then return nil end
+  local stat = vim.uv.fs_fstat(fd)
+  if not stat then
+    vim.uv.fs_close(fd)
     return nil
   end
-  local content = f:read("*a")
-  f:close()
+  local content = vim.uv.fs_read(fd, stat.size, 0)
+  vim.uv.fs_close(fd)
   return content
 end
 
 local function write_file(path, content)
   vim.fn.mkdir(vim.fn.fnamemodify(path, ":h"), "p")
-  local f = io.open(path, "w")
-  if not f then
-    return
-  end
-  f:write(content)
-  f:close()
+  local fd = vim.uv.fs_open(path, "w", 438) -- 0o666
+  if not fd then return end
+  vim.uv.fs_write(fd, content, 0)
+  vim.uv.fs_close(fd)
 end
 
 local function get_project_dir()
@@ -128,7 +129,7 @@ function M.delete()
       return
     end
     local item = items[idx]
-    os.remove(item.path)
+    vim.uv.fs_unlink(item.path)
     notify.info("library", "Deleted: " .. item.name)
   end)
 end
