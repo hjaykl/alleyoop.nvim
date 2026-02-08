@@ -14,6 +14,7 @@ local M = {}
 ---@field name string
 ---@field fn fun(ctx: alleyoop.Context): string|nil
 ---@field modes string[]
+---@field scope? "file"|"line" Determines compose_qf dedup behavior (default: "file").
 
 ---@type table<string, alleyoop.Command>
 local registry = {}
@@ -67,6 +68,7 @@ function M.get_defaults()
     {
       name = "line",
       modes = { "n" },
+      scope = "line",
       fn = function(ctx)
         return "@" .. ctx.filepath .. ":L" .. ctx.line
       end,
@@ -140,6 +142,7 @@ function M.get_defaults()
     {
       name = "line_diagnostics",
       modes = { "n" },
+      scope = "line",
       fn = function(ctx)
         local ref = "@" .. ctx.filepath .. ":L" .. ctx.line
         local line_diags = vim.tbl_filter(function(d)

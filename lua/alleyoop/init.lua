@@ -267,10 +267,35 @@ function M.reset_tmux_pane()
   targets.reset_tmux_pane()
 end
 
+--- Resolve a filepath from a quickfix entry.
+---@param item table
+---@return string|nil
+local function qf_filepath(item)
+  local filepath
+  if item.bufnr > 0 then
+    filepath = vim.api.nvim_buf_get_name(item.bufnr)
+  end
+  if (not filepath or filepath == "") and item.filename then
+    filepath = item.filename
+  end
+  if filepath == "" then
+    return nil
+  end
+  return filepath
+end
+
 --- Compose each unique file in the quickfix list.
+--- File-scoped commands deduplicate by path. Line-scoped commands
+--- visit each entry and position the cursor at the entry's line.
 ---@param cmd? string Command name (default: "file")
 function M.compose_qf(cmd)
   cmd = cmd or "file"
+  local command = commands.get(cmd)
+  if not command then
+    vim.notify("Unknown command: " .. cmd, vim.log.levels.ERROR)
+    return
+  end
+
   local qf_list = vim.fn.getqflist()
   if #qf_list == 0 then
     vim.notify("Quickfix list is empty", vim.log.levels.WARN)
@@ -278,21 +303,25 @@ function M.compose_qf(cmd)
   end
 
   local original_buf = vim.api.nvim_get_current_buf()
-  local seen = {}
 
-  for _, item in ipairs(qf_list) do
-    local filepath
-    if item.bufnr > 0 then
-      filepath = vim.api.nvim_buf_get_name(item.bufnr)
+  if command.scope == "line" then
+    for _, item in ipairs(qf_list) do
+      local filepath = qf_filepath(item)
+      if filepath then
+        vim.cmd.edit(filepath)
+        vim.api.nvim_win_set_cursor(0, { item.lnum, 0 })
+        M.compose(cmd)
+      end
     end
-    if (not filepath or filepath == "") and item.filename then
-      filepath = item.filename
-    end
-
-    if filepath and filepath ~= "" and not seen[filepath] then
-      seen[filepath] = true
-      vim.cmd.edit(filepath)
-      M.compose(cmd)
+  else
+    local seen = {}
+    for _, item in ipairs(qf_list) do
+      local filepath = qf_filepath(item)
+      if filepath and not seen[filepath] then
+        seen[filepath] = true
+        vim.cmd.edit(filepath)
+        M.compose(cmd)
+      end
     end
   end
 
