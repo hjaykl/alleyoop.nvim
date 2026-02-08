@@ -199,13 +199,14 @@ end
 
 --- Execute a command and append the result to the compose list.
 ---@param cmd string
-function M.compose(cmd)
+---@param silent? boolean Suppress notification (for batch operations).
+function M.compose(cmd, silent)
   if in_builder() then
     return
   end
   local ref = commands.execute(cmd)
   if ref then
-    compose.append(ref)
+    compose.append(ref, silent)
   end
 end
 
@@ -302,6 +303,7 @@ function M.compose_qf(cmd)
   end
 
   local original_buf = vim.api.nvim_get_current_buf()
+  local before = #compose.get()
 
   if command.scope == "line" then
     for _, item in ipairs(qf_list) do
@@ -309,7 +311,7 @@ function M.compose_qf(cmd)
       if filepath then
         vim.cmd.edit(filepath)
         vim.api.nvim_win_set_cursor(0, { item.lnum, 0 })
-        M.compose(cmd)
+        M.compose(cmd, true)
       end
     end
   else
@@ -319,12 +321,14 @@ function M.compose_qf(cmd)
       if filepath and not seen[filepath] then
         seen[filepath] = true
         vim.cmd.edit(filepath)
-        M.compose(cmd)
+        M.compose(cmd, true)
       end
     end
   end
 
   vim.api.nvim_set_current_buf(original_buf)
+  local added = #compose.get() - before
+  notify.info("compose", "Compose (" .. #compose.get() .. "): added " .. added .. " entries from quickfix")
 end
 
 return M

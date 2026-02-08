@@ -7,9 +7,12 @@ local items = {}
 
 --- Append a ref to the compose list and notify.
 ---@param ref string
-function M.append(ref)
+---@param silent? boolean Suppress notification (for batch operations).
+function M.append(ref, silent)
   table.insert(items, ref)
-  notify.info("compose", "Compose (" .. #items .. "): " .. ref:sub(1, 60))
+  if not silent then
+    notify.info("compose", "Compose (" .. #items .. "): " .. ref:sub(1, 60))
+  end
 end
 
 --- Clear the compose list.
