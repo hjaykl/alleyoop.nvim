@@ -18,6 +18,7 @@ local builder = require("alleyoop.builder")
 ---@class alleyoop.BuilderConfig
 ---@field width? number
 ---@field height? number
+---@field title? string|false
 
 local defaults = {
   commands = {},
@@ -28,6 +29,7 @@ local defaults = {
   builder = {
     width = 0.8,
     height = 0.6,
+    title = "Alley-Oop",
   },
 }
 

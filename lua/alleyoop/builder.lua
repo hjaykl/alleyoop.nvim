@@ -10,6 +10,8 @@ local library = require("alleyoop.library")
 local width_frac = 0.8
 ---@type number
 local height_frac = 0.6
+---@type string|nil
+local title_text = "Alley-Oop"
 
 ---@type integer|nil
 local builder_win = nil
@@ -21,10 +23,15 @@ local draft = nil
 local buf_counter = 0
 
 --- Initialize builder with config.
----@param config { width: number, height: number }
+---@param config { width: number, height: number, title: string|false }
 function M.init(config)
   width_frac = config.width
   height_frac = config.height
+  if config.title == false or config.title == "" then
+    title_text = nil
+  else
+    title_text = config.title
+  end
 end
 
 local function set_buf_content(buf, win, content)
@@ -45,7 +52,7 @@ local function update_header(win, index, total)
     return
   end
 
-  local center = " Alleyoop "
+  local center = title_text and (" " .. title_text .. " ") or nil
   local right
   if total > 0 and index <= total then
     right = " C-p/C-n (" .. string.format("%2d/%-2d", total - index + 1, total) .. ") "
@@ -54,7 +61,7 @@ local function update_header(win, index, total)
   end
 
   local title, title_pos
-  if right then
+  if center and right then
     local w = vim.api.nvim_win_get_width(win)
     local cw = vim.api.nvim_strwidth(center)
     local rw = vim.api.nvim_strwidth(right)
@@ -67,7 +74,10 @@ local function update_header(win, index, total)
       { right, "FloatTitle" },
     }
     title_pos = "left"
-  else
+  elseif right then
+    title = right
+    title_pos = "right"
+  elseif center then
     title = center
     title_pos = "center"
   end
@@ -108,8 +118,8 @@ function M.open()
     row = math.floor((vim.o.lines - height) / 2) - 1,
     col = math.floor((vim.o.columns - width) / 2),
     border = "rounded",
-    title = " Alleyoop ",
-    title_pos = "center",
+    title = title_text and (" " .. title_text .. " ") or nil,
+    title_pos = title_text and "center" or nil,
     footer = build_footer(),
     footer_pos = "center",
   })
