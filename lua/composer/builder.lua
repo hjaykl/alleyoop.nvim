@@ -34,24 +34,44 @@ end
 
 local function build_footer()
   local target_name = targets.get_default_name()
-  return " :w → " .. target_name .. " | <C-t> target | <C-p>/<C-n> history | <C-l> library | q cancel "
+  return " :w → " .. target_name .. " | C-t target | C-l save | q close "
 end
 
 local function update_header(win, index, total)
   if not vim.api.nvim_win_is_valid(win) then
     return
   end
-  local title
+
+  local center = " Composer "
+  local right
   if total > 0 and index <= total then
-    title = " Composer (" .. index .. "/" .. total .. ") "
+    right = " C-p/C-n (" .. string.format("%2d/%-2d", total - index + 1, total) .. ") "
   elseif total > 0 then
-    title = " Composer (new | " .. total .. " saved) "
-  else
-    title = " Composer "
+    right = " C-p/C-n ( new ) "
   end
+
+  local title, title_pos
+  if right then
+    local w = vim.api.nvim_win_get_width(win)
+    local cw = vim.api.nvim_strwidth(center)
+    local rw = vim.api.nvim_strwidth(right)
+    local pad_left = math.max(0, math.floor((w - cw) / 2))
+    local pad_mid = math.max(1, w - pad_left - cw - rw)
+    title = {
+      { string.rep("─", pad_left), "FloatBorder" },
+      { center, "FloatTitle" },
+      { string.rep("─", pad_mid), "FloatBorder" },
+      { right, "FloatTitle" },
+    }
+    title_pos = "left"
+  else
+    title = center
+    title_pos = "center"
+  end
+
   vim.api.nvim_win_set_config(win, {
     title = title,
-    title_pos = "center",
+    title_pos = title_pos,
     footer = build_footer(),
     footer_pos = "center",
   })
