@@ -14,6 +14,9 @@ local height_frac = 0.6
 ---@type integer|nil
 local builder_win = nil
 
+---@type string|nil
+local draft = nil
+
 --- Counter for unique buffer names
 local buf_counter = 0
 
@@ -117,10 +120,23 @@ function M.open()
   local entries = history.get_entries()
   local current_index = #entries + 1
 
-  -- Pre-fill with chain content if non-empty
+  -- Build initial content from draft + any new chain refs
+  local initial = draft or ""
   if not chain.is_empty() then
-    set_buf_content(buf, win, chain.content())
+    if initial ~= "" then
+      initial = initial .. "\n\n" .. chain.content()
+    else
+      initial = chain.content()
+    end
   end
+  chain.clear()
+
+  if initial ~= "" then
+    set_buf_content(buf, win, initial)
+  end
+
+  -- Capture for C-n "back to draft" navigation
+  local draft_content = initial
   update_header(win, current_index, #entries)
 
   local function close()
@@ -129,28 +145,30 @@ function M.open()
     end
   end
 
-  local function dispatch_and_close(target_name)
+  local function save_draft_and_close()
+    draft = table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n")
+    if draft == "" then
+      draft = nil
+    end
+    close()
+  end
+
+  local function dispatch_and_close()
     local content = table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n")
     if content == "" then
       vim.notify("Empty prompt, nothing to dispatch", vim.log.levels.WARN)
       return
     end
-    if target_name then
-      targets.dispatch(target_name, content)
-    else
-      targets.dispatch_default(content)
-    end
+    targets.dispatch_default(content)
     history.save(content)
-    chain.clear()
+    draft = nil
     close()
   end
 
   -- BufWriteCmd: :w dispatches to default target
   vim.api.nvim_create_autocmd("BufWriteCmd", {
     buffer = buf,
-    callback = function()
-      dispatch_and_close(nil)
-    end,
+    callback = dispatch_and_close,
   })
 
   -- BufWipeout: clean up guard state
@@ -163,8 +181,8 @@ function M.open()
 
   local map = vim.keymap.set
 
-  -- q: close without dispatching (chain preserved)
-  map("n", "q", close, { buffer = buf, nowait = true })
+  -- q: save draft and close without dispatching
+  map("n", "q", save_draft_and_close, { buffer = buf, nowait = true })
 
   -- <C-p>: previous history entry
   map("n", "<C-p>", function()
@@ -186,24 +204,24 @@ function M.open()
     end
     current_index = current_index + 1
     if current_index > #entries then
-      local draft = chain.content()
-      set_buf_content(buf, win, draft)
+      set_buf_content(buf, win, draft_content)
     else
       set_buf_content(buf, win, entries[current_index])
     end
     update_header(win, current_index, #entries)
   end, { buffer = buf })
 
-  -- <C-t>: pick target then dispatch
+  -- <C-t>: switch dispatch target
   map("n", "<C-t>", function()
     local target_list = targets.list()
     local names = vim.tbl_map(function(t)
       return t.name
     end, target_list)
 
-    picker.select(names, { prompt = "Dispatch to:" }, function(choice)
+    picker.select(names, { prompt = "Set target:" }, function(choice)
       if choice then
-        dispatch_and_close(choice)
+        targets.set_default(choice)
+        update_header(win, current_index, #entries)
       end
     end)
   end, { buffer = buf })
