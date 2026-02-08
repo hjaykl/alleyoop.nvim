@@ -127,7 +127,7 @@ function M.setup(opts)
       local inner = callback
       callback = function()
         inner()
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>`<", true, false, true), "nx", false)
       end
     end
     if callback then
