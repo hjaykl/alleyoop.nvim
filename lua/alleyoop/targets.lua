@@ -131,6 +131,11 @@ function M.get(name)
   return registry[name]
 end
 
+--- Reset the cached tmux pane, prompting on next dispatch.
+function M.reset_tmux_pane()
+  tmux_pane = nil
+end
+
 --- List all registered targets.
 ---@return alleyoop.Target[]
 function M.list()

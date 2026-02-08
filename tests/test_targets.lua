@@ -91,4 +91,9 @@ T["setup"]["throwing target does not propagate error"] = function()
   targets.dispatch("broken", "test prompt")
 end
 
+T["setup"]["reset_tmux_pane is callable"] = function()
+  -- Should not error
+  targets.reset_tmux_pane()
+end
+
 return T

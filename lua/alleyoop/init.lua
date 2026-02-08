@@ -215,4 +215,9 @@ function M.set_default_target(name)
   targets.set_default(name)
 end
 
+--- Reset the cached tmux pane, prompting on next dispatch.
+function M.reset_tmux_pane()
+  targets.reset_tmux_pane()
+end
+
 return M
