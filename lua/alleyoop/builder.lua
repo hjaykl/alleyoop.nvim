@@ -3,7 +3,6 @@ local M = {}
 local compose = require("alleyoop.compose")
 local history = require("alleyoop.history")
 local targets = require("alleyoop.targets")
-local picker = require("alleyoop.picker")
 local library = require("alleyoop.library")
 
 ---@type number
@@ -237,7 +236,7 @@ function M.open()
       return t.name
     end, target_list)
 
-    picker.select(names, { prompt = "Set target:" }, function(choice)
+    vim.ui.select(names, { prompt = "Set target:" }, function(choice)
       if choice then
         targets.set_default(choice)
         update_header(win, current_index, #entries)

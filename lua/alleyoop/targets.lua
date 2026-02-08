@@ -126,13 +126,12 @@ function M.set_default(name)
     return
   end
 
-  local picker = require("alleyoop.picker")
   local items = M.list()
   local names = vim.tbl_map(function(t)
     return t.name
   end, items)
 
-  picker.select(names, { prompt = "Default target:" }, function(choice)
+  vim.ui.select(names, { prompt = "Default target:" }, function(choice)
     if choice then
       activate_target(choice)
     end

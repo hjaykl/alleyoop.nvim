@@ -1,6 +1,5 @@
 local M = {}
 
-local picker = require("alleyoop.picker")
 local notify = require("alleyoop.notify")
 
 ---@type string
@@ -97,7 +96,7 @@ function M.browse(callback)
     return item.name
   end, items)
 
-  picker.select(display, { prompt = "Prompt Library:" }, function(_, idx)
+  vim.ui.select(display, { prompt = "Prompt Library:" }, function(_, idx)
     if not idx then
       return
     end
@@ -124,7 +123,7 @@ function M.delete()
     return item.name
   end, items)
 
-  picker.select(display, { prompt = "Delete from library:" }, function(_, idx)
+  vim.ui.select(display, { prompt = "Delete from library:" }, function(_, idx)
     if not idx then
       return
     end
@@ -150,7 +149,7 @@ function M.save(content)
   end
 
   if project_dir then
-    picker.select({ "Project (.alleyoop/)", "Global" }, { prompt = "Save to:" }, function(choice)
+    vim.ui.select({ "Project (.alleyoop/)", "Global" }, { prompt = "Save to:" }, function(choice)
       if not choice then
         return
       end
