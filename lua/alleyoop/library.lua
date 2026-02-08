@@ -1,6 +1,7 @@
 local M = {}
 
 local picker = require("alleyoop.picker")
+local notify = require("alleyoop.notify")
 
 ---@type string
 local global_dir = ""
@@ -129,7 +130,7 @@ function M.delete()
     end
     local item = items[idx]
     os.remove(item.path)
-    vim.notify("Deleted: " .. item.name, vim.log.levels.INFO)
+    notify.info("library", "Deleted: " .. item.name)
   end)
 end
 
@@ -144,7 +145,7 @@ function M.save(content)
         return
       end
       write_file(dir .. "/" .. name .. ".md", content)
-      vim.notify("Saved to " .. scope .. " library: " .. name, vim.log.levels.INFO)
+      notify.info("library", "Saved to " .. scope .. " library: " .. name)
     end)
   end
 

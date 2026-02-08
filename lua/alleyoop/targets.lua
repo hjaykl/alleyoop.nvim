@@ -1,5 +1,7 @@
 local M = {}
 
+local notify = require("alleyoop.notify")
+
 ---@class alleyoop.Target
 ---@field name string
 ---@field fn fun(prompt: string)
@@ -21,7 +23,7 @@ local function get_builtins()
       name = "clipboard",
       fn = function(prompt)
         vim.fn.setreg("+", prompt)
-        vim.notify("Prompt copied to clipboard", vim.log.levels.INFO)
+        notify.info("dispatch", "Prompt copied to clipboard")
       end,
     },
     {
@@ -35,7 +37,7 @@ local function get_builtins()
         local function send(pane)
           vim.fn.system({ "tmux", "load-buffer", "-" }, prompt)
           vim.fn.system({ "tmux", "paste-buffer", "-t", pane })
-          vim.notify("Sent to tmux pane: " .. pane, vim.log.levels.INFO)
+          notify.info("dispatch", "Sent to tmux pane: " .. pane)
         end
 
         if tmux_pane then
@@ -95,7 +97,7 @@ function M.set_default(name)
       return
     end
     default_name = name
-    vim.notify("Default target: " .. name, vim.log.levels.INFO)
+    notify.info("target", "Default target: " .. name)
     return
   end
 
@@ -108,7 +110,7 @@ function M.set_default(name)
   picker.select(names, { prompt = "Default target:" }, function(choice)
     if choice then
       default_name = choice
-      vim.notify("Default target: " .. choice, vim.log.levels.INFO)
+      notify.info("target", "Default target: " .. choice)
     end
   end)
 end

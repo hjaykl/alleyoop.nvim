@@ -1,5 +1,7 @@
 local M = {}
 
+local notify = require("alleyoop.notify")
+
 ---@type string[]
 local items = {}
 
@@ -7,7 +9,7 @@ local items = {}
 ---@param ref string
 function M.append(ref)
   table.insert(items, ref)
-  vim.notify("Compose (" .. #items .. "): " .. ref:sub(1, 60), vim.log.levels.INFO)
+  notify.info("compose", "Compose (" .. #items .. "): " .. ref:sub(1, 60))
 end
 
 --- Clear the compose list.

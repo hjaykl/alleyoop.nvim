@@ -6,6 +6,7 @@ local targets = require("alleyoop.targets")
 local history = require("alleyoop.history")
 local library = require("alleyoop.library")
 local builder = require("alleyoop.builder")
+local notify = require("alleyoop.notify")
 
 ---@class alleyoop.Config
 ---@field commands? alleyoop.Command[]
@@ -13,6 +14,7 @@ local builder = require("alleyoop.builder")
 ---@field default_target? string
 ---@field max_history? integer
 ---@field mappings? table<string, string|false>
+---@field notify? table|false
 ---@field builder? alleyoop.BuilderConfig
 
 ---@class alleyoop.BuilderConfig
@@ -26,6 +28,7 @@ local defaults = {
   default_target = "clipboard",
   max_history = 50,
   mappings = {},
+  notify = { compose = true, dispatch = true, target = true, library = true },
   builder = {
     width = 0.8,
     height = 0.6,
@@ -107,9 +110,14 @@ end
 --- Merge user config and initialize all modules.
 ---@param opts? alleyoop.Config
 function M.setup(opts)
-  local config = vim.tbl_deep_extend("force", defaults, opts or {})
+  opts = opts or {}
+  -- Extract notify before tbl_deep_extend (false is not a table)
+  local notify_opts = opts.notify
+  opts.notify = nil
+  local config = vim.tbl_deep_extend("force", defaults, opts)
 
   -- Init modules
+  notify.init(notify_opts)
   commands.register(commands.get_defaults(), config.commands)
   targets.register(config.targets, config.default_target)
   history.init(config.max_history)
@@ -181,7 +189,7 @@ end
 --- Clear the compose list.
 function M.clear_compose()
   compose.clear()
-  vim.notify("Compose cleared", vim.log.levels.INFO)
+  notify.info("compose", "Compose cleared")
 end
 
 --- Return a shallow copy of the compose list.

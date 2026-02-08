@@ -18,7 +18,7 @@ Requires Neovim >= 0.10.
 
 ```lua
 {
-  "yourusername/alleyoop.nvim",
+  "hjaykl/alleyoop.nvim",
   config = function()
     require("alleyoop").setup()
   end,
@@ -134,6 +134,13 @@ require("alleyoop").setup({
   targets = {},           -- additional targets (same name overrides built-ins)
   default_target = "clipboard",
   max_history = 50,
+  notify = {
+    compose = true,     -- "Compose (3): @/foo.lua", "Compose cleared"
+    dispatch = true,    -- "Prompt copied to clipboard", "Sent to tmux pane: ..."
+    target = true,      -- "Default target: tmux"
+    library = true,     -- "Saved to...", "Deleted:..."
+  },
+  -- notify = false,    -- disable all INFO notifications
   builder = {
     width = 0.8,          -- fraction of editor width
     height = 0.6,         -- fraction of editor height
