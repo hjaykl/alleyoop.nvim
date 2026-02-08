@@ -1,7 +1,7 @@
 local M = {}
 
 local commands = require("alleyoop.commands")
-local chain = require("alleyoop.chain")
+local compose = require("alleyoop.compose")
 local targets = require("alleyoop.targets")
 local history = require("alleyoop.history")
 local library = require("alleyoop.library")
@@ -35,33 +35,33 @@ local defaults = {
 
 --- Default mapping definitions.
 --- Each entry: { key, mode, action_type, action_arg|nil, desc }
---- action_type: "copy", "chain", "fn"
---- For "copy"/"chain", action_arg is the command name.
+--- action_type: "copy", "compose", "fn"
+--- For "copy"/"compose", action_arg is the command name.
 --- For "fn", action_arg is the function to call.
 local default_mappings = {
-  copy_file              = { "<leader>af",  "n", "copy",  "file",             "Copy file ref" },
-  copy_file_content      = { "<leader>aF",  "n", "copy",  "file_content",     "Copy file with content" },
-  copy_line              = { "<leader>at",  "n", "copy",  "line",             "Copy line ref" },
-  copy_range             = { "<leader>at",  "v", "copy",  "range",            "Copy range ref" },
-  copy_range_content     = { "<leader>av",  "v", "copy",  "range_content",    "Copy range with content" },
-  copy_line_diagnostics  = { "<leader>ad",  "n", "copy",  "line_diagnostics", "Copy line diagnostics" },
-  copy_range_diagnostics = { "<leader>ad",  "v", "copy",  "range_diagnostics","Copy range with diagnostics" },
-  copy_buf_diagnostics   = { "<leader>aD",  "n", "copy",  "buf_diagnostics",  "Copy buffer diagnostics" },
-  copy_quickfix          = { "<leader>aq",  "n", "copy",  "quickfix",         "Copy quickfix list" },
-  chain_file             = { "<leader>acf", "n", "chain", "file",             "Chain file ref" },
-  chain_file_content     = { "<leader>acF", "n", "chain", "file_content",     "Chain file with content" },
-  chain_line             = { "<leader>act", "n", "chain", "line",             "Chain line ref" },
-  chain_range            = { "<leader>act", "v", "chain", "range",            "Chain range ref" },
-  chain_range_content    = { "<leader>acv", "v", "chain", "range_content",    "Chain range with content" },
-  chain_line_diagnostics = { "<leader>acd", "n", "chain", "line_diagnostics", "Chain line diagnostics" },
-  chain_range_diagnostics= { "<leader>acd", "v", "chain", "range_diagnostics","Chain range with diagnostics" },
-  chain_buf_diagnostics  = { "<leader>acD", "n", "chain", "buf_diagnostics",  "Chain buffer diagnostics" },
-  chain_quickfix         = { "<leader>acq", "n", "chain", "quickfix",         "Chain quickfix list" },
-  clear_chain            = { "<leader>ax",  "n", "fn",    nil,                "Clear chain" },
-  open_builder           = { "<leader>ap",  "n", "fn",    nil,                "Open prompt builder" },
-  set_target             = { "<leader>aT",  "n", "fn",    nil,                "Set default target" },
-  browse_library         = { "<leader>al",  "n", "fn",    nil,                "Browse prompt library" },
-  delete_library         = { "<leader>aL",  "n", "fn",    nil,                "Delete from library" },
+  copy_file                = { "<leader>af",  "n", "copy",    "file",             "Copy file ref" },
+  copy_file_content        = { "<leader>aF",  "n", "copy",    "file_content",     "Copy file with content" },
+  copy_line                = { "<leader>at",  "n", "copy",    "line",             "Copy line ref" },
+  copy_range               = { "<leader>at",  "v", "copy",    "range",            "Copy range ref" },
+  copy_range_content       = { "<leader>av",  "v", "copy",    "range_content",    "Copy range with content" },
+  copy_line_diagnostics    = { "<leader>ad",  "n", "copy",    "line_diagnostics", "Copy line diagnostics" },
+  copy_range_diagnostics   = { "<leader>ad",  "v", "copy",    "range_diagnostics","Copy range with diagnostics" },
+  copy_buf_diagnostics     = { "<leader>aD",  "n", "copy",    "buf_diagnostics",  "Copy buffer diagnostics" },
+  copy_quickfix            = { "<leader>aq",  "n", "copy",    "quickfix",         "Copy quickfix list" },
+  compose_file             = { "<leader>acf", "n", "compose", "file",             "Compose file ref" },
+  compose_file_content     = { "<leader>acF", "n", "compose", "file_content",     "Compose file with content" },
+  compose_line             = { "<leader>act", "n", "compose", "line",             "Compose line ref" },
+  compose_range            = { "<leader>act", "v", "compose", "range",            "Compose range ref" },
+  compose_range_content    = { "<leader>acv", "v", "compose", "range_content",    "Compose range with content" },
+  compose_line_diagnostics = { "<leader>acd", "n", "compose", "line_diagnostics", "Compose line diagnostics" },
+  compose_range_diagnostics= { "<leader>acd", "v", "compose", "range_diagnostics","Compose range with diagnostics" },
+  compose_buf_diagnostics  = { "<leader>acD", "n", "compose", "buf_diagnostics",  "Compose buffer diagnostics" },
+  compose_quickfix         = { "<leader>acq", "n", "compose", "quickfix",         "Compose quickfix list" },
+  clear_compose            = { "<leader>ax",  "n", "fn",      nil,                "Clear compose" },
+  open_builder             = { "<leader>ap",  "n", "fn",      nil,                "Open prompt builder" },
+  set_target               = { "<leader>aT",  "n", "fn",      nil,                "Set default target" },
+  browse_library           = { "<leader>al",  "n", "fn",      nil,                "Browse prompt library" },
+  delete_library           = { "<leader>aL",  "n", "fn",      nil,                "Delete from library" },
 }
 
 --- Get the callback for a mapping action.
@@ -70,14 +70,14 @@ local function get_callback(mapping_name, action_type, action_arg)
     return function()
       M.copy_ref(action_arg)
     end
-  elseif action_type == "chain" then
+  elseif action_type == "compose" then
     return function()
-      M.chain(action_arg)
+      M.compose(action_arg)
     end
   elseif action_type == "fn" then
-    if mapping_name == "clear_chain" then
+    if mapping_name == "clear_compose" then
       return function()
-        M.clear_chain()
+        M.clear_compose()
       end
     elseif mapping_name == "open_builder" then
       return function()
@@ -91,8 +91,8 @@ local function get_callback(mapping_name, action_type, action_arg)
       return function()
         library.browse(function(content)
           builder.close()
-          chain.clear()
-          chain.append(content)
+          compose.clear()
+          compose.append(content)
           M.open()
         end)
       end
@@ -154,15 +154,15 @@ local function in_builder()
   return vim.api.nvim_buf_get_name(0):match("^alleyoop://") ~= nil
 end
 
---- Execute a command and append the result to the chain.
+--- Execute a command and append the result to the compose list.
 ---@param cmd string
-function M.chain(cmd)
+function M.compose(cmd)
   if in_builder() then
     return
   end
   local ref = commands.execute(cmd)
   if ref then
-    chain.append(ref)
+    compose.append(ref)
   end
 end
 
@@ -178,16 +178,16 @@ function M.copy_ref(cmd)
   end
 end
 
---- Clear the chain.
-function M.clear_chain()
-  chain.clear()
-  vim.notify("Chain cleared", vim.log.levels.INFO)
+--- Clear the compose list.
+function M.clear_compose()
+  compose.clear()
+  vim.notify("Compose cleared", vim.log.levels.INFO)
 end
 
---- Return a shallow copy of the chain.
+--- Return a shallow copy of the compose list.
 ---@return string[]
-function M.get_chain()
-  return chain.get()
+function M.get_compose()
+  return compose.get()
 end
 
 --- Return the registered command list.

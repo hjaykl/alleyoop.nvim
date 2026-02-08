@@ -1,6 +1,6 @@
 local M = {}
 
-local chain = require("alleyoop.chain")
+local compose = require("alleyoop.compose")
 local history = require("alleyoop.history")
 local targets = require("alleyoop.targets")
 local picker = require("alleyoop.picker")
@@ -139,16 +139,16 @@ function M.open()
   local entries = history.get_entries()
   local current_index = #entries + 1
 
-  -- Build initial content from draft + any new chain refs
+  -- Build initial content from draft + any new composed refs
   local initial = draft or ""
-  if not chain.is_empty() then
+  if not compose.is_empty() then
     if initial ~= "" then
-      initial = initial .. "\n\n" .. chain.content()
+      initial = initial .. "\n\n" .. compose.content()
     else
-      initial = chain.content()
+      initial = compose.content()
     end
   end
-  chain.clear()
+  compose.clear()
 
   if initial ~= "" then
     set_buf_content(buf, win, initial)

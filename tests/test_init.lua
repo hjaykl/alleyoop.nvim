@@ -67,10 +67,10 @@ T["setup"]["public API functions exist"] = function()
   alleyoop.setup()
 
   expect.equality(type(alleyoop.open), "function")
-  expect.equality(type(alleyoop.chain), "function")
+  expect.equality(type(alleyoop.compose), "function")
   expect.equality(type(alleyoop.copy_ref), "function")
-  expect.equality(type(alleyoop.clear_chain), "function")
-  expect.equality(type(alleyoop.get_chain), "function")
+  expect.equality(type(alleyoop.clear_compose), "function")
+  expect.equality(type(alleyoop.get_compose), "function")
   expect.equality(type(alleyoop.get_commands), "function")
   expect.equality(type(alleyoop.get_targets), "function")
   expect.equality(type(alleyoop.set_default_target), "function")
@@ -92,11 +92,11 @@ T["setup"]["get_targets returns registered targets"] = function()
   expect.equality(#tgts >= 2, true)
 end
 
-T["setup"]["get_chain returns empty on start"] = function()
+T["setup"]["get_compose returns empty on start"] = function()
   local alleyoop = require("alleyoop")
   alleyoop.setup()
 
-  expect.equality(alleyoop.get_chain(), {})
+  expect.equality(alleyoop.get_compose(), {})
 end
 
 return T
