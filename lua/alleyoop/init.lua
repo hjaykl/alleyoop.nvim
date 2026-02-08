@@ -148,6 +148,7 @@ function M.setup(opts)
       local inner = callback
       callback = function()
         inner()
+        -- Exit visual mode and jump to selection start (like yank)
         vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>`<", true, false, true), "nx", false)
       end
     end
