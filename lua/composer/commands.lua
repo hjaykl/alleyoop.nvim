@@ -108,6 +108,10 @@ function M.get_defaults()
         if not ctx.start_line or not ctx.lines then
           return nil
         end
+        local numbered = {}
+        for i, line in ipairs(ctx.lines) do
+          table.insert(numbered, string.format("%3d | %s", ctx.start_line + i - 1, line))
+        end
         local ref = "@"
           .. ctx.filepath
           .. ":L"
@@ -117,7 +121,7 @@ function M.get_defaults()
           .. "\n\n```"
           .. ctx.filetype
           .. "\n"
-          .. table.concat(ctx.lines, "\n")
+          .. table.concat(numbered, "\n")
           .. "\n```"
         local range_diags = vim.tbl_filter(function(d)
           return d.lnum >= ctx.start_line - 1 and d.lnum <= ctx.end_line - 1
