@@ -46,7 +46,7 @@ function M.build_context()
   return ctx
 end
 
---- Return the 7 default commands.
+--- Return the default commands.
 ---@return alleyoop.Command[]
 function M.get_defaults()
   return {

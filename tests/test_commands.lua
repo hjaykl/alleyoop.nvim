@@ -74,10 +74,10 @@ T["setup"]["file command returns @filepath"] = function()
   expect.equality(cmd.fn(ctx), "@/home/user/test.lua")
 end
 
-T["setup"]["line command returns @filepath:Lline"] = function()
+T["setup"]["line command returns @filepath :Lline"] = function()
   local cmd = commands.get("line")
   local ctx = { filepath = "/home/user/test.lua", filetype = "lua", line = 42, diagnostics = {}, qf_list = {} }
-  expect.equality(cmd.fn(ctx), "@/home/user/test.lua:L42")
+  expect.equality(cmd.fn(ctx), "@/home/user/test.lua :L42")
 end
 
 T["setup"]["range command returns nil without visual selection"] = function()
@@ -93,7 +93,7 @@ T["setup"]["range command returns range with visual selection"] = function()
     start_line = 10, end_line = 25,
     diagnostics = {}, qf_list = {},
   }
-  expect.equality(cmd.fn(ctx), "@/test.lua:L10-25")
+  expect.equality(cmd.fn(ctx), "@/test.lua :L10-25")
 end
 
 T["setup"]["range_content includes code block"] = function()

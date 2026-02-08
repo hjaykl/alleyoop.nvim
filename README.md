@@ -25,7 +25,7 @@ You already know where the relevant code is. Alleyoop lets you hand the model ex
   → finally starts thinking about your bug
 
 # With alleyoop — you provide the context
-> @auth.lua:L42-58 (range with code)
+> @auth.lua :L42-58 (range with code)
 > L45: ERROR Undefined variable 'session_token' [lua_ls]
 > Fix the undefined variable — it was renamed to `token` in the last refactor.
   → model starts immediately
@@ -68,7 +68,7 @@ There are two modes of operation:
 | `<leader>ad` | n | Line diagnostics |
 | `<leader>ad` | v | Range with code + diagnostics |
 | `<leader>aD` | n | All buffer diagnostics |
-| `<leader>aq` | n | Quickfix list |
+| `<leader>aQ` | n | Quickfix list |
 
 ### Compose and build
 
@@ -82,9 +82,19 @@ There are two modes of operation:
 | `<leader>acd` | n | Compose line diagnostics |
 | `<leader>acd` | v | Compose range + diagnostics |
 | `<leader>acD` | n | Compose buffer diagnostics |
-| `<leader>acq` | n | Compose quickfix list |
+| `<leader>ay` | n | Dispatch compose to target |
 | `<leader>ax` | n | Clear compose list |
 | `<leader>ap` | n | Open builder |
+
+### Quickfix compose
+
+| Mapping | Mode | Description |
+|---------|------|-------------|
+| `<leader>aqf` | n | QF compose file refs |
+| `<leader>aqF` | n | QF compose with content |
+| `<leader>aqt` | n | QF compose line refs |
+| `<leader>aqD` | n | QF compose buffer diagnostics |
+| `<leader>aqq` | n | Compose quickfix list |
 
 ### Workflow
 
@@ -181,7 +191,7 @@ require("alleyoop").setup({
 
 All default mappings can be remapped or disabled by name:
 
-`copy_file`, `copy_file_content`, `copy_line`, `copy_range`, `copy_range_content`, `copy_line_diagnostics`, `copy_range_diagnostics`, `copy_buf_diagnostics`, `copy_quickfix`, `compose_file`, `compose_file_content`, `compose_line`, `compose_range`, `compose_range_content`, `compose_line_diagnostics`, `compose_range_diagnostics`, `compose_buf_diagnostics`, `compose_quickfix`, `clear_compose`, `open_builder`, `set_target`, `browse_library`, `delete_library`
+`copy_file`, `copy_file_content`, `copy_line`, `copy_range`, `copy_range_content`, `copy_line_diagnostics`, `copy_range_diagnostics`, `copy_buf_diagnostics`, `copy_quickfix`, `compose_file`, `compose_file_content`, `compose_line`, `compose_range`, `compose_range_content`, `compose_line_diagnostics`, `compose_range_diagnostics`, `compose_buf_diagnostics`, `qf_file`, `qf_file_content`, `qf_line`, `qf_buf_diagnostics`, `qf_quickfix`, `dispatch_compose`, `clear_compose`, `open_builder`, `set_target`, `browse_library`, `delete_library`
 
 ### Custom commands
 
