@@ -20,7 +20,7 @@ end
 --- Return a shallow copy of the compose list.
 ---@return string[]
 function M.get()
-  return { unpack(items) }
+  return vim.list_extend({}, items)
 end
 
 --- Return compose entries joined by double newlines, or empty string.
