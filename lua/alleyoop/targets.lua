@@ -79,7 +79,10 @@ function M.dispatch(name, prompt)
     vim.notify("Unknown target: " .. name, vim.log.levels.ERROR)
     return
   end
-  target.fn(prompt)
+  local ok, err = pcall(target.fn, prompt)
+  if not ok then
+    vim.notify("Target '" .. name .. "' failed: " .. tostring(err), vim.log.levels.ERROR)
+  end
 end
 
 --- Dispatch prompt to the default target.

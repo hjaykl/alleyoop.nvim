@@ -231,7 +231,12 @@ function M.execute(name)
   end
 
   local ctx = M.build_context()
-  return cmd.fn(ctx)
+  local ok, result = pcall(cmd.fn, ctx)
+  if not ok then
+    vim.notify("Command '" .. name .. "' failed: " .. tostring(result), vim.log.levels.ERROR)
+    return nil
+  end
+  return result
 end
 
 --- Get a command by name.

@@ -82,4 +82,13 @@ T["setup"]["get returns nil for unknown"] = function()
   expect.equality(targets.get("nonexistent"), nil)
 end
 
+T["setup"]["throwing target does not propagate error"] = function()
+  local user = {
+    { name = "broken", fn = function() error("kaboom") end },
+  }
+  targets.register(user, "broken")
+  -- Should not error, just notify
+  targets.dispatch("broken", "test prompt")
+end
+
 return T

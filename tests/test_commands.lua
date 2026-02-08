@@ -116,4 +116,13 @@ T["setup"]["quickfix returns nil on empty list"] = function()
   expect.equality(cmd.fn(ctx), nil)
 end
 
+T["setup"]["throwing command does not propagate error"] = function()
+  local user = {
+    { name = "broken", modes = { "n" }, fn = function() error("kaboom") end },
+  }
+  commands.register(commands.get_defaults(), user)
+  local result = commands.execute("broken")
+  expect.equality(result, nil)
+end
+
 return T
