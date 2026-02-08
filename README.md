@@ -10,6 +10,29 @@ AI coding tools work better with precise context. But assembling that context by
 
 Alleyoop gives you keybindings to collect context from your editor and compose it into a prompt, without leaving Neovim.
 
+### Skip the search, save the tokens
+
+When an AI agent needs context, it searches your codebase — grepping for symbols, reading candidate files, backtracking when it guesses wrong. That exploration can burn tens of thousands of tokens before the model even starts working on your problem.
+
+You already know where the relevant code is. Alleyoop lets you hand the model exactly what it needs:
+
+```
+# Without alleyoop — agent explores on its own
+> "There's a bug in the auth flow, can you fix it?"
+  → agent greps for "auth" (2K tokens)
+  → reads auth.lua, session.lua, middleware.lua (8K tokens)
+  → re-reads auth.lua more carefully (3K tokens)
+  → finally starts thinking about your bug
+
+# With alleyoop — you provide the context
+> @auth.lua:L42-58 (range with code)
+> L45: ERROR Undefined variable 'session_token' [lua_ls]
+> Fix the undefined variable — it was renamed to `token` in the last refactor.
+  → model starts immediately
+```
+
+Fewer input tokens means lower API costs and less noise for the model to wade through — which typically means better answers, too.
+
 ## Install
 
 Requires Neovim >= 0.10.
