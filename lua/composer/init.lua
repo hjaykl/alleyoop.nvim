@@ -123,6 +123,13 @@ function M.setup(opts)
     end
 
     local callback = get_callback(name, def[3], def[4])
+    if callback and mode == "v" then
+      local inner = callback
+      callback = function()
+        inner()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
+      end
+    end
     if callback then
       vim.keymap.set(mode, lhs, callback, { desc = def[5], silent = true })
     end
@@ -136,9 +143,16 @@ function M.open()
   builder.open()
 end
 
+local function in_builder()
+  return vim.api.nvim_buf_get_name(0):match("^composer://") ~= nil
+end
+
 --- Execute a command and append the result to the chain.
 ---@param cmd string
 function M.chain(cmd)
+  if in_builder() then
+    return
+  end
   local ref = commands.execute(cmd)
   if ref then
     chain.append(ref)
@@ -148,6 +162,9 @@ end
 --- Execute a command and dispatch the result to the default target.
 ---@param cmd string
 function M.copy_ref(cmd)
+  if in_builder() then
+    return
+  end
   local ref = commands.execute(cmd)
   if ref then
     targets.dispatch_default(ref)
