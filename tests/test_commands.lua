@@ -15,9 +15,9 @@ T["setup"] = new_set({
   },
 })
 
-T["setup"]["get_defaults returns 7 commands"] = function()
+T["setup"]["get_defaults returns 9 commands"] = function()
   local defaults = commands.get_defaults()
-  expect.equality(#defaults, 7)
+  expect.equality(#defaults, 9)
 end
 
 T["setup"]["register merges user commands"] = function()

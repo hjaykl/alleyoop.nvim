@@ -37,7 +37,7 @@ end
 
 local function build_footer()
   local target_name = targets.get_default_name()
-  return " :w → " .. target_name .. " | C-t target | C-l save | q close "
+  return " :w → " .. target_name .. " | C-t target | C-s save | C-l clear | q close "
 end
 
 local function update_header(win, index, total)
@@ -226,14 +226,19 @@ function M.open()
     end)
   end, { buffer = buf })
 
-  -- <C-l>: save buffer content to library
-  map("n", "<C-l>", function()
+  -- <C-s>: save buffer content to library
+  map("n", "<C-s>", function()
     local content = table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n")
     if content == "" then
       vim.notify("Empty prompt, nothing to save", vim.log.levels.WARN)
       return
     end
     library.save(content)
+  end, { buffer = buf })
+
+  -- <C-l>: clear buffer
+  map("n", "<C-l>", function()
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {})
   end, { buffer = buf })
 end
 

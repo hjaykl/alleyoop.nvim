@@ -57,6 +57,14 @@ function M.get_defaults()
       end,
     },
     {
+      name = "file_content",
+      modes = { "n" },
+      fn = function(ctx)
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+        return "@" .. ctx.filepath .. "\n\n```" .. ctx.filetype .. "\n" .. table.concat(lines, "\n") .. "\n```"
+      end,
+    },
+    {
       name = "line",
       modes = { "n" },
       fn = function(ctx)
@@ -91,6 +99,38 @@ function M.get_defaults()
           .. "\n"
           .. table.concat(ctx.lines, "\n")
           .. "\n```"
+      end,
+    },
+    {
+      name = "range_diagnostics",
+      modes = { "v" },
+      fn = function(ctx)
+        if not ctx.start_line or not ctx.lines then
+          return nil
+        end
+        local ref = "@"
+          .. ctx.filepath
+          .. ":L"
+          .. ctx.start_line
+          .. "-"
+          .. ctx.end_line
+          .. "\n\n```"
+          .. ctx.filetype
+          .. "\n"
+          .. table.concat(ctx.lines, "\n")
+          .. "\n```"
+        local range_diags = vim.tbl_filter(function(d)
+          return d.lnum >= ctx.start_line - 1 and d.lnum <= ctx.end_line - 1
+        end, ctx.diagnostics)
+        if #range_diags > 0 then
+          ref = ref .. "\n\nDiagnostics:"
+          for i, d in ipairs(range_diags) do
+            local source = d.source and (" [" .. d.source .. "]") or ""
+            local severity = vim.diagnostic.severity[d.severity] or "?"
+            ref = ref .. "\n" .. i .. ". L" .. (d.lnum + 1) .. ": " .. severity .. " " .. d.message .. source
+          end
+        end
+        return ref
       end,
     },
     {
