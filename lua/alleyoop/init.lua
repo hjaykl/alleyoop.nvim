@@ -62,7 +62,6 @@ local default_mappings = {
   qf_file                  = { "<leader>aqf", "n", "compose_qf", "file",             "QF compose file refs" },
   qf_file_content          = { "<leader>aqF", "n", "compose_qf", "file_content",    "QF compose with content" },
   qf_line                  = { "<leader>aqt", "n", "compose_qf", "line",             "QF compose line refs" },
-  qf_line_diagnostics      = { "<leader>aqd", "n", "compose_qf", "line_diagnostics", "QF compose line diagnostics" },
   qf_buf_diagnostics       = { "<leader>aqD", "n", "compose_qf", "buf_diagnostics",  "QF compose buffer diagnostics" },
   qf_quickfix              = { "<leader>aqq", "n", "compose",    "quickfix",         "Compose quickfix list" },
   dispatch_compose         = { "<leader>ay",  "n", "fn",      nil,                "Dispatch compose to target" },
@@ -173,8 +172,8 @@ function M.setup(opts)
   end
 
   -- Register user commands
-  vim.api.nvim_create_user_command("AoComposeQf", function(opts)
-    M.compose_qf(opts.args ~= "" and opts.args or nil)
+  vim.api.nvim_create_user_command("AoComposeQf", function(cmd_opts)
+    M.compose_qf(cmd_opts.args ~= "" and cmd_opts.args or nil)
   end, {
     nargs = "?",
     desc = "Compose each quickfix file",
