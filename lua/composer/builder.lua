@@ -32,17 +32,29 @@ local function set_buf_content(buf, win, content)
   end
 end
 
-local function update_title(win, index, total)
+local function build_footer()
+  local target_name = targets.get_default_name()
+  return " :w → " .. target_name .. " | <C-t> target | <C-p>/<C-n> history | <C-l> library | q cancel "
+end
+
+local function update_header(win, index, total)
   if not vim.api.nvim_win_is_valid(win) then
     return
   end
-  local title = " Composer "
+  local title
   if total > 0 and index <= total then
     title = " Composer (" .. index .. "/" .. total .. ") "
   elseif total > 0 then
     title = " Composer (new | " .. total .. " saved) "
+  else
+    title = " Composer "
   end
-  vim.api.nvim_win_set_config(win, { title = title, title_pos = "center" })
+  vim.api.nvim_win_set_config(win, {
+    title = title,
+    title_pos = "center",
+    footer = build_footer(),
+    footer_pos = "center",
+  })
 end
 
 --- Open the prompt builder floating window.
@@ -66,7 +78,7 @@ function M.open()
     border = "rounded",
     title = " Composer ",
     title_pos = "center",
-    footer = " :w dispatch | <C-t> target | <C-p>/<C-n> history | <C-l> library | q cancel ",
+    footer = build_footer(),
     footer_pos = "center",
   })
 
@@ -89,7 +101,7 @@ function M.open()
   if not chain.is_empty() then
     set_buf_content(buf, win, chain.content())
   end
-  update_title(win, current_index, #entries)
+  update_header(win, current_index, #entries)
 
   local function close()
     if vim.api.nvim_win_is_valid(win) then
@@ -144,7 +156,7 @@ function M.open()
       current_index = 1
     end
     set_buf_content(buf, win, entries[current_index])
-    update_title(win, current_index, #entries)
+    update_header(win, current_index, #entries)
   end, { buffer = buf })
 
   -- <C-n>: next history entry
@@ -159,7 +171,7 @@ function M.open()
     else
       set_buf_content(buf, win, entries[current_index])
     end
-    update_title(win, current_index, #entries)
+    update_header(win, current_index, #entries)
   end, { buffer = buf })
 
   -- <C-t>: pick target then dispatch
