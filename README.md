@@ -84,7 +84,7 @@ There are two modes of operation:
 | `<leader>acD` | n | Compose buffer diagnostics |
 | `<leader>ay` | n | Dispatch compose to target |
 | `<leader>ax` | n | Clear compose list |
-| `<leader>ap` | n | Open builder |
+| `<leader>aa` | n | Open builder |
 
 ### Quickfix compose
 
@@ -99,7 +99,7 @@ There are two modes of operation:
 ### Workflow
 
 1. Navigate to files and compose references with `<leader>ac_` mappings
-2. Open the builder with `<leader>ap`
+2. Open the builder with `<leader>aa`
 3. Edit the prompt — add instructions, reorder, remove what you don't need
 4. `:w` to dispatch to the current target
 
