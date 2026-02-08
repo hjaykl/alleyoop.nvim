@@ -42,7 +42,7 @@ end
 ---@param max_history integer
 function M.init(max_history)
   max_entries = max_history
-  history_dir = vim.fn.stdpath("data") .. "/composer/history"
+  history_dir = vim.fn.stdpath("data") .. "/alleyoop/history"
   entries = {}
   local files = get_history_files()
   for _, file in ipairs(files) do

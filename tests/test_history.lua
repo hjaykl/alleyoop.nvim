@@ -10,12 +10,12 @@ T["setup"] = new_set({
   hooks = {
     pre_case = function()
       -- Create a temp dir for test isolation
-      test_dir = vim.fn.tempname() .. "/composer_test_history"
+      test_dir = vim.fn.tempname() .. "/alleyoop_test_history"
       vim.fn.mkdir(test_dir, "p")
 
       -- Override stdpath to use test dir
-      package.loaded["composer.history"] = nil
-      history = require("composer.history")
+      package.loaded["alleyoop.history"] = nil
+      history = require("alleyoop.history")
 
       -- Monkey-patch stdpath for isolation
       local orig_stdpath = vim.fn.stdpath

@@ -1,10 +1,10 @@
 local M = {}
 
-local chain = require("composer.chain")
-local history = require("composer.history")
-local targets = require("composer.targets")
-local picker = require("composer.picker")
-local library = require("composer.library")
+local chain = require("alleyoop.chain")
+local history = require("alleyoop.history")
+local targets = require("alleyoop.targets")
+local picker = require("alleyoop.picker")
+local library = require("alleyoop.library")
 
 ---@type number
 local width_frac = 0.8
@@ -45,7 +45,7 @@ local function update_header(win, index, total)
     return
   end
 
-  local center = " Composer "
+  local center = " Alleyoop "
   local right
   if total > 0 and index <= total then
     right = " C-p/C-n (" .. string.format("%2d/%-2d", total - index + 1, total) .. ") "
@@ -80,6 +80,15 @@ local function update_header(win, index, total)
   })
 end
 
+--- Close the builder window and clear the draft.
+function M.close()
+  draft = nil
+  if builder_win and vim.api.nvim_win_is_valid(builder_win) then
+    vim.api.nvim_win_close(builder_win, true)
+  end
+  builder_win = nil
+end
+
 --- Open the prompt builder floating window.
 function M.open()
   -- Double-open guard
@@ -99,7 +108,7 @@ function M.open()
     row = math.floor((vim.o.lines - height) / 2) - 1,
     col = math.floor((vim.o.columns - width) / 2),
     border = "rounded",
-    title = " Composer ",
+    title = " Alleyoop ",
     title_pos = "center",
     footer = build_footer(),
     footer_pos = "center",
@@ -109,7 +118,7 @@ function M.open()
 
   -- Unique buffer name to avoid collisions
   buf_counter = buf_counter + 1
-  vim.api.nvim_buf_set_name(buf, "composer://prompt-" .. buf_counter)
+  vim.api.nvim_buf_set_name(buf, "alleyoop://prompt-" .. buf_counter)
   vim.bo[buf].filetype = "markdown"
   vim.bo[buf].buftype = "acwrite"
   vim.bo[buf].bufhidden = "wipe"

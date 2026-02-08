@@ -1,6 +1,6 @@
 local M = {}
 
----@class composer.Context
+---@class alleyoop.Context
 ---@field filepath string
 ---@field filetype string
 ---@field line integer
@@ -10,17 +10,17 @@ local M = {}
 ---@field diagnostics table[]
 ---@field qf_list table[]
 
----@class composer.Command
+---@class alleyoop.Command
 ---@field name string
----@field fn fun(ctx: composer.Context): string|nil
+---@field fn fun(ctx: alleyoop.Context): string|nil
 ---@field modes string[]
 
----@type table<string, composer.Command>
+---@type table<string, alleyoop.Command>
 local registry = {}
 
 --- Build context from current editor state.
 --- For visual mode, captures selection before it's lost.
----@return composer.Context
+---@return alleyoop.Context
 function M.build_context()
   local mode = vim.fn.mode()
   local ctx = {
@@ -46,7 +46,7 @@ function M.build_context()
 end
 
 --- Return the 7 default commands.
----@return composer.Command[]
+---@return alleyoop.Command[]
 function M.get_defaults()
   return {
     {
@@ -192,8 +192,8 @@ function M.get_defaults()
 end
 
 --- Register commands. User commands with the same name override defaults.
----@param defaults composer.Command[]
----@param user_commands composer.Command[]
+---@param defaults alleyoop.Command[]
+---@param user_commands alleyoop.Command[]
 function M.register(defaults, user_commands)
   registry = {}
   for _, cmd in ipairs(defaults) do
@@ -236,13 +236,13 @@ end
 
 --- Get a command by name.
 ---@param name string
----@return composer.Command|nil
+---@return alleyoop.Command|nil
 function M.get(name)
   return registry[name]
 end
 
 --- List all registered commands.
----@return composer.Command[]
+---@return alleyoop.Command[]
 function M.list()
   local result = {}
   for _, cmd in pairs(registry) do

@@ -1,11 +1,11 @@
 local M = {}
 
-local picker = require("composer.picker")
+local picker = require("alleyoop.picker")
 
 ---@type string
 local global_dir = ""
 
----@class composer.LibraryItem
+---@class alleyoop.LibraryItem
 ---@field name string
 ---@field path string
 ---@field scope string
@@ -31,9 +31,9 @@ local function write_file(path, content)
 end
 
 local function get_project_dir()
-  local root = vim.fs.root(0, { ".composer" })
+  local root = vim.fs.root(0, { ".alleyoop" })
   if root then
-    return root .. "/.composer"
+    return root .. "/.alleyoop"
   end
   return nil
 end
@@ -47,11 +47,11 @@ end
 
 --- Initialize library with global directory path.
 function M.init()
-  global_dir = vim.fn.stdpath("data") .. "/composer/library"
+  global_dir = vim.fn.stdpath("data") .. "/alleyoop/library"
 end
 
 --- Get all library items sorted: project first, then alpha.
----@return composer.LibraryItem[]
+---@return alleyoop.LibraryItem[]
 function M.get_items()
   local items = {}
 
@@ -149,7 +149,7 @@ function M.save(content)
   end
 
   if project_dir then
-    picker.select({ "Project (.composer/)", "Global" }, { prompt = "Save to:" }, function(choice)
+    picker.select({ "Project (.alleyoop/)", "Global" }, { prompt = "Save to:" }, function(choice)
       if not choice then
         return
       end

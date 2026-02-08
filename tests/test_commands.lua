@@ -8,8 +8,8 @@ local commands
 T["setup"] = new_set({
   hooks = {
     pre_case = function()
-      package.loaded["composer.commands"] = nil
-      commands = require("composer.commands")
+      package.loaded["alleyoop.commands"] = nil
+      commands = require("alleyoop.commands")
       commands.register(commands.get_defaults(), {})
     end,
   },

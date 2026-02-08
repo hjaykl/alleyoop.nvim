@@ -8,18 +8,18 @@ T["setup"] = new_set({
     pre_case = function()
       -- Reset all modules
       for key in pairs(package.loaded) do
-        if key:match("^composer") then
+        if key:match("^alleyoop") then
           package.loaded[key] = nil
         end
       end
 
-      local history = require("composer.history")
-      local targets = require("composer.targets")
-      local library = require("composer.library")
-      local builder = require("composer.builder")
+      local history = require("alleyoop.history")
+      local targets = require("alleyoop.targets")
+      local library = require("alleyoop.library")
+      local builder = require("alleyoop.builder")
 
       -- Use temp dirs for isolation
-      local test_dir = vim.fn.tempname() .. "/composer_test_builder"
+      local test_dir = vim.fn.tempname() .. "/alleyoop_test_builder"
       vim.fn.mkdir(test_dir, "p")
       local orig_stdpath = vim.fn.stdpath
       vim.fn.stdpath = function(what)
@@ -39,7 +39,7 @@ T["setup"] = new_set({
       for _, win in ipairs(vim.api.nvim_list_wins()) do
         local buf = vim.api.nvim_win_get_buf(win)
         local name = vim.api.nvim_buf_get_name(buf)
-        if name:match("^composer://") then
+        if name:match("^alleyoop://") then
           vim.api.nvim_win_close(win, true)
         end
       end
@@ -48,15 +48,15 @@ T["setup"] = new_set({
 })
 
 T["setup"]["open creates a floating window"] = function()
-  local builder = require("composer.builder")
+  local builder = require("alleyoop.builder")
   builder.open()
 
-  -- Find the composer window
+  -- Find the alleyoop window
   local found = false
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     local buf = vim.api.nvim_win_get_buf(win)
     local name = vim.api.nvim_buf_get_name(buf)
-    if name:match("^composer://") then
+    if name:match("^alleyoop://") then
       found = true
       expect.equality(vim.api.nvim_win_is_valid(win), true)
       expect.equality(vim.bo[buf].filetype, "markdown")
@@ -68,13 +68,13 @@ T["setup"]["open creates a floating window"] = function()
 end
 
 T["setup"]["double open does not create second window"] = function()
-  local builder = require("composer.builder")
+  local builder = require("alleyoop.builder")
   builder.open()
 
   local count_before = 0
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     local buf = vim.api.nvim_win_get_buf(win)
-    if vim.api.nvim_buf_get_name(buf):match("^composer://") then
+    if vim.api.nvim_buf_get_name(buf):match("^alleyoop://") then
       count_before = count_before + 1
     end
   end
@@ -84,7 +84,7 @@ T["setup"]["double open does not create second window"] = function()
   local count_after = 0
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     local buf = vim.api.nvim_win_get_buf(win)
-    if vim.api.nvim_buf_get_name(buf):match("^composer://") then
+    if vim.api.nvim_buf_get_name(buf):match("^alleyoop://") then
       count_after = count_after + 1
     end
   end
@@ -94,14 +94,14 @@ T["setup"]["double open does not create second window"] = function()
 end
 
 T["setup"]["q keymap closes window"] = function()
-  local builder = require("composer.builder")
+  local builder = require("alleyoop.builder")
   builder.open()
 
   -- Find the builder window and buffer
   local builder_win
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     local buf = vim.api.nvim_win_get_buf(win)
-    if vim.api.nvim_buf_get_name(buf):match("^composer://") then
+    if vim.api.nvim_buf_get_name(buf):match("^alleyoop://") then
       builder_win = win
       break
     end

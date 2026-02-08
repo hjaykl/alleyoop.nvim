@@ -8,8 +8,8 @@ local chain
 T["setup"] = new_set({
   hooks = {
     pre_case = function()
-      package.loaded["composer.chain"] = nil
-      chain = require("composer.chain")
+      package.loaded["alleyoop.chain"] = nil
+      chain = require("alleyoop.chain")
     end,
   },
 })

@@ -1,21 +1,21 @@
 local M = {}
 
-local commands = require("composer.commands")
-local chain = require("composer.chain")
-local targets = require("composer.targets")
-local history = require("composer.history")
-local library = require("composer.library")
-local builder = require("composer.builder")
+local commands = require("alleyoop.commands")
+local chain = require("alleyoop.chain")
+local targets = require("alleyoop.targets")
+local history = require("alleyoop.history")
+local library = require("alleyoop.library")
+local builder = require("alleyoop.builder")
 
----@class composer.Config
----@field commands? composer.Command[]
----@field targets? composer.Target[]
+---@class alleyoop.Config
+---@field commands? alleyoop.Command[]
+---@field targets? alleyoop.Target[]
 ---@field default_target? string
 ---@field max_history? integer
 ---@field mappings? table<string, string|false>
----@field builder? composer.BuilderConfig
+---@field builder? alleyoop.BuilderConfig
 
----@class composer.BuilderConfig
+---@class alleyoop.BuilderConfig
 ---@field width? number
 ---@field height? number
 
@@ -88,6 +88,7 @@ local function get_callback(mapping_name, action_type, action_arg)
     elseif mapping_name == "browse_library" then
       return function()
         library.browse(function(content)
+          builder.close()
           chain.clear()
           chain.append(content)
           M.open()
@@ -102,7 +103,7 @@ local function get_callback(mapping_name, action_type, action_arg)
 end
 
 --- Merge user config and initialize all modules.
----@param opts? composer.Config
+---@param opts? alleyoop.Config
 function M.setup(opts)
   local config = vim.tbl_deep_extend("force", defaults, opts or {})
 
@@ -148,7 +149,7 @@ function M.open()
 end
 
 local function in_builder()
-  return vim.api.nvim_buf_get_name(0):match("^composer://") ~= nil
+  return vim.api.nvim_buf_get_name(0):match("^alleyoop://") ~= nil
 end
 
 --- Execute a command and append the result to the chain.
@@ -188,13 +189,13 @@ function M.get_chain()
 end
 
 --- Return the registered command list.
----@return composer.Command[]
+---@return alleyoop.Command[]
 function M.get_commands()
   return commands.list()
 end
 
 --- Return the registered target list.
----@return composer.Target[]
+---@return alleyoop.Target[]
 function M.get_targets()
   return targets.list()
 end

@@ -8,9 +8,9 @@ local targets
 T["setup"] = new_set({
   hooks = {
     pre_case = function()
-      package.loaded["composer.targets"] = nil
-      package.loaded["composer.picker"] = nil
-      targets = require("composer.targets")
+      package.loaded["alleyoop.targets"] = nil
+      package.loaded["alleyoop.picker"] = nil
+      targets = require("alleyoop.targets")
       targets.register({}, nil)
     end,
   },

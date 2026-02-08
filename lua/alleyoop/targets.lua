@@ -1,10 +1,10 @@
 local M = {}
 
----@class composer.Target
+---@class alleyoop.Target
 ---@field name string
 ---@field fn fun(prompt: string)
 
----@type table<string, composer.Target>
+---@type table<string, alleyoop.Target>
 local registry = {}
 
 ---@type string|nil
@@ -14,7 +14,7 @@ local default_name = nil
 local tmux_pane = nil
 
 --- Return the 2 built-in targets.
----@return composer.Target[]
+---@return alleyoop.Target[]
 local function get_builtins()
   return {
     {
@@ -55,7 +55,7 @@ local function get_builtins()
 end
 
 --- Register targets. User targets with the same name override built-ins.
----@param user_targets composer.Target[]
+---@param user_targets alleyoop.Target[]
 ---@param default string|nil
 function M.register(user_targets, default)
   registry = {}
@@ -99,7 +99,7 @@ function M.set_default(name)
     return
   end
 
-  local picker = require("composer.picker")
+  local picker = require("alleyoop.picker")
   local items = M.list()
   local names = vim.tbl_map(function(t)
     return t.name
@@ -121,13 +121,13 @@ end
 
 --- Get a target by name.
 ---@param name string
----@return composer.Target|nil
+---@return alleyoop.Target|nil
 function M.get(name)
   return registry[name]
 end
 
 --- List all registered targets.
----@return composer.Target[]
+---@return alleyoop.Target[]
 function M.list()
   local result = {}
   for _, target in pairs(registry) do

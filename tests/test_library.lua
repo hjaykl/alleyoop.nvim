@@ -18,12 +18,12 @@ end
 T["setup"] = new_set({
   hooks = {
     pre_case = function()
-      test_dir = vim.fn.tempname() .. "/composer_test_library"
+      test_dir = vim.fn.tempname() .. "/alleyoop_test_library"
       vim.fn.mkdir(test_dir, "p")
 
-      package.loaded["composer.library"] = nil
-      package.loaded["composer.picker"] = nil
-      library = require("composer.library")
+      package.loaded["alleyoop.library"] = nil
+      package.loaded["alleyoop.picker"] = nil
+      library = require("alleyoop.library")
 
       -- Override stdpath for isolation
       local orig_stdpath = vim.fn.stdpath
@@ -48,7 +48,7 @@ T["setup"]["get_items returns empty when no files"] = function()
 end
 
 T["setup"]["get_items finds md files"] = function()
-  local lib_dir = test_dir .. "/composer/library"
+  local lib_dir = test_dir .. "/alleyoop/library"
   write_file(lib_dir .. "/test-prompt.md", "# Test prompt")
   write_file(lib_dir .. "/refactoring/extract.md", "# Extract function")
 
@@ -57,7 +57,7 @@ T["setup"]["get_items finds md files"] = function()
 end
 
 T["setup"]["get_items returns correct structure"] = function()
-  local lib_dir = test_dir .. "/composer/library"
+  local lib_dir = test_dir .. "/alleyoop/library"
   write_file(lib_dir .. "/my-prompt.md", "content")
 
   local items = library.get_items()
@@ -68,13 +68,13 @@ T["setup"]["get_items returns correct structure"] = function()
 end
 
 T["setup"]["get_items sorts project before global"] = function()
-  local lib_dir = test_dir .. "/composer/library"
+  local lib_dir = test_dir .. "/alleyoop/library"
   write_file(lib_dir .. "/global-prompt.md", "global")
 
-  -- Create a project dir with .composer
+  -- Create a project dir with .alleyoop
   local project_dir = test_dir .. "/project"
-  vim.fn.mkdir(project_dir .. "/.composer", "p")
-  write_file(project_dir .. "/.composer/project-prompt.md", "project")
+  vim.fn.mkdir(project_dir .. "/.alleyoop", "p")
+  write_file(project_dir .. "/.alleyoop/project-prompt.md", "project")
 
   -- Override vim.fs.root for this test
   local orig_root = vim.fs.root
@@ -82,8 +82,8 @@ T["setup"]["get_items sorts project before global"] = function()
     return project_dir
   end
 
-  package.loaded["composer.library"] = nil
-  library = require("composer.library")
+  package.loaded["alleyoop.library"] = nil
+  library = require("alleyoop.library")
   local orig_stdpath = vim.fn.stdpath
   vim.fn.stdpath = function(what)
     if what == "data" then

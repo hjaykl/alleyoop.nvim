@@ -8,13 +8,13 @@ T["setup"] = new_set({
     pre_case = function()
       -- Reset all modules
       for key in pairs(package.loaded) do
-        if key:match("^composer") then
+        if key:match("^alleyoop") then
           package.loaded[key] = nil
         end
       end
 
       -- Use temp dir for isolation
-      local test_dir = vim.fn.tempname() .. "/composer_test_init"
+      local test_dir = vim.fn.tempname() .. "/alleyoop_test_init"
       vim.fn.mkdir(test_dir, "p")
       local orig_stdpath = vim.fn.stdpath
       vim.fn.stdpath = function(what)
@@ -28,18 +28,18 @@ T["setup"] = new_set({
 })
 
 T["setup"]["setup without error"] = function()
-  local composer = require("composer")
-  composer.setup()
+  local alleyoop = require("alleyoop")
+  alleyoop.setup()
 end
 
 T["setup"]["setup with empty opts"] = function()
-  local composer = require("composer")
-  composer.setup({})
+  local alleyoop = require("alleyoop")
+  alleyoop.setup({})
 end
 
 T["setup"]["setup with custom config"] = function()
-  local composer = require("composer")
-  composer.setup({
+  local alleyoop = require("alleyoop")
+  alleyoop.setup({
     max_history = 100,
     default_target = "clipboard",
     builder = { width = 0.9, height = 0.7 },
@@ -47,8 +47,8 @@ T["setup"]["setup with custom config"] = function()
 end
 
 T["setup"]["disabled mapping is not set"] = function()
-  local composer = require("composer")
-  composer.setup({ mappings = { copy_quickfix = false } })
+  local alleyoop = require("alleyoop")
+  alleyoop.setup({ mappings = { copy_quickfix = false } })
 
   -- Verify the default mapping for copy_quickfix doesn't exist
   local maps = vim.api.nvim_get_keymap("n")
@@ -63,40 +63,40 @@ T["setup"]["disabled mapping is not set"] = function()
 end
 
 T["setup"]["public API functions exist"] = function()
-  local composer = require("composer")
-  composer.setup()
+  local alleyoop = require("alleyoop")
+  alleyoop.setup()
 
-  expect.equality(type(composer.open), "function")
-  expect.equality(type(composer.chain), "function")
-  expect.equality(type(composer.copy_ref), "function")
-  expect.equality(type(composer.clear_chain), "function")
-  expect.equality(type(composer.get_chain), "function")
-  expect.equality(type(composer.get_commands), "function")
-  expect.equality(type(composer.get_targets), "function")
-  expect.equality(type(composer.set_default_target), "function")
+  expect.equality(type(alleyoop.open), "function")
+  expect.equality(type(alleyoop.chain), "function")
+  expect.equality(type(alleyoop.copy_ref), "function")
+  expect.equality(type(alleyoop.clear_chain), "function")
+  expect.equality(type(alleyoop.get_chain), "function")
+  expect.equality(type(alleyoop.get_commands), "function")
+  expect.equality(type(alleyoop.get_targets), "function")
+  expect.equality(type(alleyoop.set_default_target), "function")
 end
 
 T["setup"]["get_commands returns registered commands"] = function()
-  local composer = require("composer")
-  composer.setup()
+  local alleyoop = require("alleyoop")
+  alleyoop.setup()
 
-  local cmds = composer.get_commands()
+  local cmds = alleyoop.get_commands()
   expect.equality(#cmds >= 7, true)
 end
 
 T["setup"]["get_targets returns registered targets"] = function()
-  local composer = require("composer")
-  composer.setup()
+  local alleyoop = require("alleyoop")
+  alleyoop.setup()
 
-  local tgts = composer.get_targets()
+  local tgts = alleyoop.get_targets()
   expect.equality(#tgts >= 2, true)
 end
 
 T["setup"]["get_chain returns empty on start"] = function()
-  local composer = require("composer")
-  composer.setup()
+  local alleyoop = require("alleyoop")
+  alleyoop.setup()
 
-  expect.equality(composer.get_chain(), {})
+  expect.equality(alleyoop.get_chain(), {})
 end
 
 return T
