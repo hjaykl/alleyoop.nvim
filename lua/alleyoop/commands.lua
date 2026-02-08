@@ -70,7 +70,7 @@ function M.get_defaults()
       modes = { "n" },
       scope = "line",
       fn = function(ctx)
-        return "@" .. ctx.filepath .. ":L" .. ctx.line
+        return "@" .. ctx.filepath .. " :L" .. ctx.line
       end,
     },
     {
@@ -80,7 +80,7 @@ function M.get_defaults()
         if not ctx.start_line then
           return nil
         end
-        return "@" .. ctx.filepath .. ":L" .. ctx.start_line .. "-" .. ctx.end_line
+        return "@" .. ctx.filepath .. " :L" .. ctx.start_line .. "-" .. ctx.end_line
       end,
     },
     {
@@ -92,7 +92,7 @@ function M.get_defaults()
         end
         return "@"
           .. ctx.filepath
-          .. ":L"
+          .. " :L"
           .. ctx.start_line
           .. "-"
           .. ctx.end_line
@@ -116,7 +116,7 @@ function M.get_defaults()
         end
         local ref = "@"
           .. ctx.filepath
-          .. ":L"
+          .. " :L"
           .. ctx.start_line
           .. "-"
           .. ctx.end_line
@@ -144,7 +144,7 @@ function M.get_defaults()
       modes = { "n" },
       scope = "line",
       fn = function(ctx)
-        local ref = "@" .. ctx.filepath .. ":L" .. ctx.line
+        local ref = "@" .. ctx.filepath .. " :L" .. ctx.line
         local line_diags = vim.tbl_filter(function(d)
           return d.lnum == ctx.line - 1
         end, ctx.diagnostics)
