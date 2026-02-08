@@ -305,6 +305,9 @@ function M.compose_qf(cmd)
   local original_buf = vim.api.nvim_get_current_buf()
   local before = #compose.get()
 
+  local saved_ei = vim.o.eventignore
+  vim.o.eventignore = "all"
+
   if command.scope == "line" then
     for _, item in ipairs(qf_list) do
       local filepath = qf_filepath(item)
@@ -326,6 +329,7 @@ function M.compose_qf(cmd)
     end
   end
 
+  vim.o.eventignore = saved_ei
   vim.api.nvim_set_current_buf(original_buf)
   local added = #compose.get() - before
   notify.info("compose", "Compose (" .. #compose.get() .. "): added " .. added .. " entries from quickfix")
