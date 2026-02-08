@@ -67,6 +67,30 @@ local default_mappings = {
   delete_library           = { "<leader>aL",  "n", "fn",      nil,                "Delete from library" },
 }
 
+--- Named function actions for "fn" type mappings.
+local fn_actions = {
+  clear_compose = function()
+    M.clear_compose()
+  end,
+  open_builder = function()
+    M.open()
+  end,
+  set_target = function()
+    M.set_default_target()
+  end,
+  browse_library = function()
+    library.browse(function(content)
+      builder.close()
+      compose.clear()
+      compose.append(content)
+      M.open()
+    end)
+  end,
+  delete_library = function()
+    library.delete()
+  end,
+}
+
 --- Get the callback for a mapping action.
 local function get_callback(mapping_name, action_type, action_arg)
   if action_type == "copy" then
@@ -78,32 +102,7 @@ local function get_callback(mapping_name, action_type, action_arg)
       M.compose(action_arg)
     end
   elseif action_type == "fn" then
-    if mapping_name == "clear_compose" then
-      return function()
-        M.clear_compose()
-      end
-    elseif mapping_name == "open_builder" then
-      return function()
-        M.open()
-      end
-    elseif mapping_name == "set_target" then
-      return function()
-        M.set_default_target()
-      end
-    elseif mapping_name == "browse_library" then
-      return function()
-        library.browse(function(content)
-          builder.close()
-          compose.clear()
-          compose.append(content)
-          M.open()
-        end)
-      end
-    elseif mapping_name == "delete_library" then
-      return function()
-        library.delete()
-      end
-    end
+    return fn_actions[mapping_name]
   end
 end
 
