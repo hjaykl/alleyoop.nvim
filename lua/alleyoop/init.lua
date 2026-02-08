@@ -50,7 +50,7 @@ local default_mappings = {
   copy_line_diagnostics    = { "<leader>ad",  "n", "copy",    "line_diagnostics", "Copy line diagnostics" },
   copy_range_diagnostics   = { "<leader>ad",  "v", "copy",    "range_diagnostics","Copy range with diagnostics" },
   copy_buf_diagnostics     = { "<leader>aD",  "n", "copy",    "buf_diagnostics",  "Copy buffer diagnostics" },
-  copy_quickfix            = { "<leader>aq",  "n", "copy",    "quickfix",         "Copy quickfix list" },
+  copy_quickfix            = { "<leader>aQ",  "n", "copy",    "quickfix",         "Copy quickfix list" },
   compose_file             = { "<leader>acf", "n", "compose", "file",             "Compose file ref" },
   compose_file_content     = { "<leader>acF", "n", "compose", "file_content",     "Compose file with content" },
   compose_line             = { "<leader>act", "n", "compose", "line",             "Compose line ref" },
@@ -59,7 +59,13 @@ local default_mappings = {
   compose_line_diagnostics = { "<leader>acd", "n", "compose", "line_diagnostics", "Compose line diagnostics" },
   compose_range_diagnostics= { "<leader>acd", "v", "compose", "range_diagnostics","Compose range with diagnostics" },
   compose_buf_diagnostics  = { "<leader>acD", "n", "compose", "buf_diagnostics",  "Compose buffer diagnostics" },
-  compose_quickfix         = { "<leader>acq", "n", "compose", "quickfix",         "Compose quickfix list" },
+  qf_file                  = { "<leader>aqf", "n", "compose_qf", "file",             "QF compose file refs" },
+  qf_file_content          = { "<leader>aqF", "n", "compose_qf", "file_content",    "QF compose with content" },
+  qf_line                  = { "<leader>aqt", "n", "compose_qf", "line",             "QF compose line refs" },
+  qf_line_diagnostics      = { "<leader>aqd", "n", "compose_qf", "line_diagnostics", "QF compose line diagnostics" },
+  qf_buf_diagnostics       = { "<leader>aqD", "n", "compose_qf", "buf_diagnostics",  "QF compose buffer diagnostics" },
+  qf_quickfix              = { "<leader>aqq", "n", "compose",    "quickfix",         "Compose quickfix list" },
+  dispatch_compose         = { "<leader>ay",  "n", "fn",      nil,                "Dispatch compose to target" },
   clear_compose            = { "<leader>ax",  "n", "fn",      nil,                "Clear compose" },
   open_builder             = { "<leader>ap",  "n", "fn",      nil,                "Open prompt builder" },
   set_target               = { "<leader>aT",  "n", "fn",      nil,                "Set default target" },
@@ -69,6 +75,9 @@ local default_mappings = {
 
 --- Named function actions for "fn" type mappings.
 local fn_actions = {
+  dispatch_compose = function()
+    M.dispatch_compose()
+  end,
   clear_compose = function()
     M.clear_compose()
   end,
@@ -100,6 +109,10 @@ local function get_callback(mapping_name, action_type, action_arg)
   elseif action_type == "compose" then
     return function()
       M.compose(action_arg)
+    end
+  elseif action_type == "compose_qf" then
+    return function()
+      M.compose_qf(action_arg)
     end
   elseif action_type == "fn" then
     return fn_actions[mapping_name]
@@ -158,6 +171,22 @@ function M.setup(opts)
 
     ::continue::
   end
+
+  -- Register user commands
+  vim.api.nvim_create_user_command("AoComposeQf", function(opts)
+    M.compose_qf(opts.args ~= "" and opts.args or nil)
+  end, {
+    nargs = "?",
+    desc = "Compose each quickfix file",
+    complete = function()
+      local normal_cmds = vim.tbl_filter(function(c)
+        return vim.tbl_contains(c.modes, "n")
+      end, commands.list())
+      return vim.tbl_map(function(c)
+        return c.name
+      end, normal_cmds)
+    end,
+  })
 end
 
 --- Open the prompt builder.
@@ -193,6 +222,16 @@ function M.copy_ref(cmd)
   end
 end
 
+--- Dispatch the compose list to the default target and clear it.
+function M.dispatch_compose()
+  if compose.is_empty() then
+    vim.notify("Compose list is empty", vim.log.levels.WARN)
+    return
+  end
+  targets.dispatch_default(compose.content())
+  compose.clear()
+end
+
 --- Clear the compose list.
 function M.clear_compose()
   compose.clear()
@@ -226,6 +265,38 @@ end
 --- Reset the cached tmux pane, prompting on next dispatch.
 function M.reset_tmux_pane()
   targets.reset_tmux_pane()
+end
+
+--- Compose each unique file in the quickfix list.
+---@param cmd? string Command name (default: "file")
+function M.compose_qf(cmd)
+  cmd = cmd or "file"
+  local qf_list = vim.fn.getqflist()
+  if #qf_list == 0 then
+    vim.notify("Quickfix list is empty", vim.log.levels.WARN)
+    return
+  end
+
+  local original_buf = vim.api.nvim_get_current_buf()
+  local seen = {}
+
+  for _, item in ipairs(qf_list) do
+    local filepath
+    if item.bufnr > 0 then
+      filepath = vim.api.nvim_buf_get_name(item.bufnr)
+    end
+    if (not filepath or filepath == "") and item.filename then
+      filepath = item.filename
+    end
+
+    if filepath and filepath ~= "" and not seen[filepath] then
+      seen[filepath] = true
+      vim.cmd.edit(filepath)
+      M.compose(cmd)
+    end
+  end
+
+  vim.api.nvim_set_current_buf(original_buf)
 end
 
 return M
